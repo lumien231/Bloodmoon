@@ -1,0 +1,16 @@
+[
+{
+  "modid": "Bloodmoon",
+  "name": "Bloodmoon",
+  "description": "Adds the bloodmoon from terraria to minecraft",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["lumien"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
