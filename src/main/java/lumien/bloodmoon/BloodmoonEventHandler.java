@@ -29,19 +29,20 @@ public class BloodmoonEventHandler
 
 			if (BloodmoonHandler.INSTANCE == null)
 			{
-				System.out.println("No Data, creating");
 				BloodmoonHandler.INSTANCE = new BloodmoonHandler();
 				BloodmoonHandler.INSTANCE.markDirty();
 			}
 
 			event.world.getMapStorage().setData("Bloodmoon", BloodmoonHandler.INSTANCE);
+			
+			BloodmoonHandler.INSTANCE.updateClients();
 		}
 	}
 
 	@SubscribeEvent
 	public void livingUpdate(LivingUpdateEvent event)
 	{
-		if (BloodmoonConfig.VANISH && event.entityLiving.dimension == 0 && !event.entityLiving.worldObj.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.entityLiving.worldObj.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
+		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.entityLiving.dimension == 0 && !event.entityLiving.worldObj.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.entityLiving.worldObj.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
 		{
 			if (event.entityLiving.getEntityData().getBoolean("bloodmoonSpawned"))
 			{
@@ -53,7 +54,7 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void sleepInBed(PlayerSleepInBedEvent event)
 	{
-		if (BloodmoonConfig.NO_SLEEP)
+		if (BloodmoonHandler.INSTANCE != null && BloodmoonConfig.NO_SLEEP)
 		{
 			if (Bloodmoon.proxy.isBloodmoon())
 			{
@@ -84,7 +85,7 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void playerJoinedWorld(EntityJoinWorldEvent event)
 	{
-		if (!event.world.isRemote)
+		if (BloodmoonHandler.INSTANCE != null && !event.world.isRemote)
 		{
 			BloodmoonHandler.INSTANCE.playerJoinedWorld(event);
 		}
@@ -93,6 +94,9 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void endWorldTick(TickEvent.WorldTickEvent event)
 	{
-		BloodmoonHandler.INSTANCE.endWorldTick(event);
+		if (BloodmoonHandler.INSTANCE != null)
+		{
+			BloodmoonHandler.INSTANCE.endWorldTick(event);
+		}
 	}
 }

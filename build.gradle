@@ -17,12 +17,12 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.0"
+version = "1.1"
 group= "lumien.bloodmoon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Bloodmoon"
 
 minecraft {
-    version = "1.8-11.14.0.1273-1.8"
+    version = "1.8-11.14.1.1344"
     runDir = "eclipse"
     
     replaceIn "Bloodmoon.java"

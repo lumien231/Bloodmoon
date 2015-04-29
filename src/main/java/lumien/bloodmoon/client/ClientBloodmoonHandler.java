@@ -5,6 +5,7 @@ import lumien.bloodmoon.config.BloodmoonConfig;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -26,6 +27,8 @@ public class ClientBloodmoonHandler
 
 	float d = 1f / 15000f;
 	int difTime = 0;
+
+	double sin;
 
 	public ClientBloodmoonHandler()
 	{
@@ -58,37 +61,43 @@ public class ClientBloodmoonHandler
 		}
 	}
 
-	public int manipulateRed(int originalValue)
+	public int manipulateRed(int position, int originalValue)
 	{
 		return originalValue;
 	}
 
-	public int manipulateGreen(int originalValue)
+	public int manipulateGreen(int position, int originalValue)
 	{
 		if (isBloodmoonActive() && BloodmoonConfig.RED_LIGHT)
 		{
-			originalValue -= lightSub;
+			int height = position / 16;
 
-			return Math.max(originalValue, 0);
+			if (height < 16)
+			{
+				float mod = 1F / 16F * height;
+				originalValue -= mod * lightSub * (sin / 2f + 1);
+				return Math.max(originalValue, 0);
+			}
 		}
-		else
-		{
-			return originalValue;
-		}
+		return originalValue;
+
 	}
 
-	public int manipulateBlue(int originalValue)
+	public int manipulateBlue(int position, int originalValue)
 	{
 		if (isBloodmoonActive() && BloodmoonConfig.RED_LIGHT)
 		{
-			originalValue -= lightSub * 1.85f;
+			int height = position / 16;
 
-			return Math.max(originalValue, 0);
+			if (height < 16)
+			{
+				float mod = 1F / 16F * height;
+				originalValue -= mod * lightSub * 2.3f;
+				return Math.max(originalValue, 0);
+			}
 		}
-		else
-		{
-			return originalValue;
-		}
+		return originalValue;
+
 	}
 
 	@SubscribeEvent
@@ -97,19 +106,27 @@ public class ClientBloodmoonHandler
 		if (isBloodmoonActive())
 		{
 			WorldClient world = Minecraft.getMinecraft().theWorld;
-			if (world != null)
+			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+			if (world != null && player != null)
 			{
-				difTime = (int) (world.getWorldTime() % 24000) - 12000;
-				lightSub = (float) (Math.sin(difTime * sinMax) * 150f);
-				skyColorAdd = (float) (Math.sin(difTime * sinMax) * 0.1f);
-				moonColorRed = (float) (Math.sin(difTime * sinMax) * 0.7f);
+				double redDivisor = (player.posY / world.getActualHeight());
 
-				fogRemove = (float) (Math.sin(difTime * sinMax) * d * 6000f);
+				float difTime = (int) (world.getWorldTime() % 24000) - 12000;
+				sin = Math.sin(difTime * sinMax);
+				lightSub = (float) (sin * 150f);
+				skyColorAdd = (float) (sin * 0.1f);
+				moonColorRed = (float) (sin * 0.7f);
+
+				fogRemove = (float) (sin * d * 6000f);
 
 				if (world.provider.getDimensionId() != 0)
 				{
 					bloodmoonActive = false;
 				}
+			}
+			else if (bloodmoonActive)
+			{
+				bloodmoonActive = false;
 			}
 		}
 	}

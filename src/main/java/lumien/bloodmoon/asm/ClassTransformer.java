@@ -148,18 +148,21 @@ public class ClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
+						toInsert.add(new VarInsnNode(ILOAD, 3));
 						toInsert.add(new VarInsnNode(ILOAD, 19));
-						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateRed", "(I)I", false));
+						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateRed", "(II)I", false));
 						toInsert.add(new VarInsnNode(ISTORE, 19));
 
 						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
+						toInsert.add(new VarInsnNode(ILOAD, 3));
 						toInsert.add(new VarInsnNode(ILOAD, 20));
-						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateGreen", "(I)I", false));
+						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateGreen", "(II)I", false));
 						toInsert.add(new VarInsnNode(ISTORE, 20));
 
 						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
+						toInsert.add(new VarInsnNode(ILOAD, 3));
 						toInsert.add(new VarInsnNode(ILOAD, 21));
-						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateBlue", "(I)I", false));
+						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "manipulateBlue", "(II)I", false));
 						toInsert.add(new VarInsnNode(ISTORE, 21));
 
 						updateLightmap.instructions.insert(iin, toInsert);

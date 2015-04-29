@@ -109,6 +109,11 @@ public class BloodmoonHandler extends WorldSavedData
 		}
 		this.bloodMoon = bloodMoon;
 	}
+	
+	public void updateClients()
+	{
+		PacketHandler.INSTANCE.sendToDimension(new MessageBloodmoonStatus(bloodMoon), 0);
+	}
 
 	public void force()
 	{
@@ -138,5 +143,10 @@ public class BloodmoonHandler extends WorldSavedData
 	public boolean isBloodmoonScheduled()
 	{
 		return forceBloodMoon;
+	}
+
+	public void stop()
+	{
+		setBloodmoon(false);
 	}
 }

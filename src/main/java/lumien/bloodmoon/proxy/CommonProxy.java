@@ -18,22 +18,29 @@ public class CommonProxy
 		BloodmoonEventHandler handler = new BloodmoonEventHandler();
 		MinecraftForge.EVENT_BUS.register(handler);
 		FMLCommonHandler.instance().bus().register(handler);
-		
+
 		PacketHandler.init();
 	}
 
 	public void init(FMLInitializationEvent event)
 	{
-		
+
 	}
 
 	public void postInit(FMLPostInitializationEvent event)
 	{
-		
+
 	}
 
 	public boolean isBloodmoon()
 	{
-		return BloodmoonHandler.INSTANCE.isBloodmoonActive();
+		if (BloodmoonHandler.INSTANCE == null)
+		{
+			return false;
+		}
+		else
+		{
+			return BloodmoonHandler.INSTANCE.isBloodmoonActive();
+		}
 	}
 }
