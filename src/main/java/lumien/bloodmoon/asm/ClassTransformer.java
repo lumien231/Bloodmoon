@@ -57,7 +57,7 @@ public class ClassTransformer implements IClassTransformer
 		ClassReader classReader = new ClassReader(basicClass);
 		classReader.accept(classNode, 0);
 
-		logger.log(Level.INFO, "Found Render Global Class: " + classNode.name);
+		logger.log(Level.DEBUG, "Found Render Global Class: " + classNode.name);
 
 		String renderSkyName = MCPNames.method("func_174976_a");
 		MethodNode renderSky = null;
@@ -73,7 +73,7 @@ public class ClassTransformer implements IClassTransformer
 
 		if (renderSky != null)
 		{
-			logger.log(Level.INFO, " - Found renderSky");
+			logger.log(Level.DEBUG, " - Found renderSky");
 			for (int i = 0; i < renderSky.instructions.size(); i++)
 			{
 				AbstractInsnNode ain = renderSky.instructions.get(i);
@@ -82,7 +82,7 @@ public class ClassTransformer implements IClassTransformer
 					FieldInsnNode fin = (FieldInsnNode) ain;
 					if (fin.name.equals(MCPNames.field("field_110927_h")))
 					{
-						logger.log(Level.INFO, " - Found moonColor");
+						logger.log(Level.DEBUG, " - Found moonColor");
 						InsnList toInsert = new InsnList();
 						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
 						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "moonColorHook", "()V", false));
@@ -95,7 +95,7 @@ public class ClassTransformer implements IClassTransformer
 					MethodInsnNode min = (MethodInsnNode) ain;
 					if (min.name.equals(MCPNames.method("func_72833_a")))
 					{
-						logger.log(Level.INFO, " - Found skyColor");
+						logger.log(Level.DEBUG, " - Found skyColor");
 						InsnList toInsert = new InsnList();
 						toInsert.add(new InsnNode(DUP));
 						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
@@ -119,7 +119,7 @@ public class ClassTransformer implements IClassTransformer
 		ClassNode classNode = new ClassNode();
 		ClassReader classReader = new ClassReader(basicClass);
 		classReader.accept(classNode, 0);
-		logger.log(Level.INFO, "Found EntityRenderer Class: " + classNode.name);
+		logger.log(Level.DEBUG, "Found EntityRenderer Class: " + classNode.name);
 
 		String methodName = MCPNames.method("func_78472_g");
 
@@ -135,7 +135,7 @@ public class ClassTransformer implements IClassTransformer
 
 		if (updateLightmap != null)
 		{
-			logger.log(Level.INFO, " - Found updateLightmap");
+			logger.log(Level.DEBUG, " - Found updateLightmap");
 			boolean insertedHook = false;
 			for (int i = 0; i < updateLightmap.instructions.size(); i++)
 			{
