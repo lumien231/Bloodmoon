@@ -23,9 +23,16 @@ public class MessageBloodmoonStatus implements IMessage, IMessageHandler<Message
 	}
 
 	@Override
-	public IMessage onMessage(MessageBloodmoonStatus message, MessageContext ctx)
+	public IMessage onMessage(final MessageBloodmoonStatus message, MessageContext ctx)
 	{
-		ClientBloodmoonHandler.INSTANCE.setBloodmoon(message.bloodmoonActive);
+		Minecraft.getMinecraft().addScheduledTask(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ClientBloodmoonHandler.INSTANCE.setBloodmoon(message.bloodmoonActive);
+			}
+		});
 
 		return null;
 	}
