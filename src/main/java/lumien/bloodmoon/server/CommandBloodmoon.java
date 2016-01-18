@@ -17,7 +17,7 @@ public class CommandBloodmoon extends CommandBase
 	}
 
 	@Override
-	public String getName()
+	public String getCommandName()
 	{
 		return "bloodmoon";
 	}
@@ -29,7 +29,7 @@ public class CommandBloodmoon extends CommandBase
 	}
 
 	@Override
-	public void execute(ICommandSender sender, String[] args) throws CommandException
+	public void processCommand(ICommandSender sender, String[] args) throws CommandException
 	{
 		if (args.length == 0)
 		{

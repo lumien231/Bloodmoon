@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
@@ -20,7 +21,7 @@ public class Bloodmoon
 {
 	public static final String MOD_ID = "Bloodmoon";
 	public static final String MOD_NAME = "Bloodmoon";
-	public static final String MOD_VERSION = "@VERSION@";
+	public static final String MOD_VERSION = "1.2";
 
 	@Instance(value = "Bloodmoon")
 	public static Bloodmoon instance;

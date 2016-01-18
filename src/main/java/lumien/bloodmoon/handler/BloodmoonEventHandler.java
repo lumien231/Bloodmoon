@@ -1,14 +1,17 @@
-package lumien.bloodmoon;
+package lumien.bloodmoon.handler;
 
+import lumien.bloodmoon.Bloodmoon;
 import lumien.bloodmoon.client.ClientBloodmoonHandler;
 import lumien.bloodmoon.config.BloodmoonConfig;
 import lumien.bloodmoon.server.BloodmoonHandler;
 import net.minecraft.entity.player.EntityPlayer.EnumStatus;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ChatStyle;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogColors;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -34,8 +37,20 @@ public class BloodmoonEventHandler
 			}
 
 			event.world.getMapStorage().setData("Bloodmoon", BloodmoonHandler.INSTANCE);
-			
+
 			BloodmoonHandler.INSTANCE.updateClients();
+		}
+	}
+
+	@SubscribeEvent
+	public void livingDrops(LivingDropsEvent event)
+	{
+		if (!event.entityLiving.worldObj.isRemote)
+		{
+			if (event.source == DamageSource.outOfWorld && event.entityLiving.getEntityData().getBoolean("bloodmoonSpawned"))
+			{
+				event.setCanceled(true);
+			}
 		}
 	}
 
@@ -46,7 +61,7 @@ public class BloodmoonEventHandler
 		{
 			if (event.entityLiving.getEntityData().getBoolean("bloodmoonSpawned"))
 			{
-				event.entityLiving.setDead();
+				event.entityLiving.onKillCommand();
 			}
 		}
 	}

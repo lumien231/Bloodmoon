@@ -1,28 +1,24 @@
+// For those who want the bleeding edge
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
     }
 }
+apply plugin: 'net.minecraftforge.gradle.forge'
 
-apply plugin: 'forge'
-
-version = "1.2"
+version = "1.4"
 group= "lumien.bloodmoon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Bloodmoon"
+archivesBaseName = "Bloodmoon-MC1.8.8"
 
 minecraft {
-    version = "1.8-11.14.2.1436"
+    version = "1.8.8-11.15.0.1609-1.8.8"
     runDir = "eclipse"
     
     replaceIn "Bloodmoon.java"
@@ -33,7 +29,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_nodoc_20141130"
+    mappings = "snapshot_20151205"
 }
 
 jar {

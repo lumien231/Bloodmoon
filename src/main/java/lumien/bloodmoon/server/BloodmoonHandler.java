@@ -8,7 +8,9 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ChatStyle;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
@@ -25,7 +27,7 @@ public class BloodmoonHandler extends WorldSavedData
 
 	boolean bloodMoon;
 	boolean forceBloodMoon;
-
+	
 	public BloodmoonHandler()
 	{
 		super("Bloodmoon");
@@ -63,11 +65,11 @@ public class BloodmoonHandler extends WorldSavedData
 				int time = (int) (world.getWorldTime() % 24000);
 				if (isBloodmoonActive())
 				{
-					if (!BloodmoonConfig.RESPECT_GAMERULE || world.getGameRules().getGameRuleBooleanValue("doMobSpawning"))
+					if (!BloodmoonConfig.RESPECT_GAMERULE || world.getGameRules().getBoolean("doMobSpawning"))
 					{
 						for (int i = 0; i < BloodmoonConfig.SPAWN_SPEED; i++)
 						{
-							bloodMoonSpawner.findChunksForSpawning((WorldServer) world, true);
+							bloodMoonSpawner.findChunksForSpawning((WorldServer) world, world.getDifficulty() != EnumDifficulty.PEACEFUL, false, false);
 						}
 					}
 
@@ -109,7 +111,7 @@ public class BloodmoonHandler extends WorldSavedData
 		}
 		this.bloodMoon = bloodMoon;
 	}
-	
+
 	public void updateClients()
 	{
 		PacketHandler.INSTANCE.sendToDimension(new MessageBloodmoonStatus(bloodMoon), 0);

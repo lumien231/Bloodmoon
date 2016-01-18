@@ -8,9 +8,9 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class MessageBloodmoonStatus implements IMessage, IMessageHandler<MessageBloodmoonStatus, IMessage>
+public class MessageBloodmoonStatus implements IMessage
 {
-	boolean bloodmoonActive;
+	public boolean bloodmoonActive;
 
 	public MessageBloodmoonStatus(boolean bloodMoon)
 	{
@@ -20,21 +20,6 @@ public class MessageBloodmoonStatus implements IMessage, IMessageHandler<Message
 	public MessageBloodmoonStatus()
 	{
 
-	}
-
-	@Override
-	public IMessage onMessage(final MessageBloodmoonStatus message, MessageContext ctx)
-	{
-		Minecraft.getMinecraft().addScheduledTask(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				ClientBloodmoonHandler.INSTANCE.setBloodmoon(message.bloodmoonActive);
-			}
-		});
-
-		return null;
 	}
 
 	@Override

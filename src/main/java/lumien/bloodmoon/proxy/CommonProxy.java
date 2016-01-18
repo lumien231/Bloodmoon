@@ -1,7 +1,7 @@
 package lumien.bloodmoon.proxy;
 
-import lumien.bloodmoon.BloodmoonEventHandler;
 import lumien.bloodmoon.client.ClientBloodmoonHandler;
+import lumien.bloodmoon.handler.BloodmoonEventHandler;
 import lumien.bloodmoon.network.PacketHandler;
 import lumien.bloodmoon.server.BloodmoonHandler;
 import net.minecraft.util.Vec3;

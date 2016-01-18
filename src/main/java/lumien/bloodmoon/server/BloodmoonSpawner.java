@@ -1,10 +1,12 @@
 package lumien.bloodmoon.server;
 
-import com.google.common.collect.Sets;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
+
+import lumien.bloodmoon.config.BloodmoonConfig;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -20,297 +22,263 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
-import java.util.ArrayList;
-import java.util.Collections;
-
-import lumien.bloodmoon.config.BloodmoonConfig;
-import lumien.bloodmoon.network.PacketHandler;
-import lumien.bloodmoon.network.messages.MessageSpawnParticles;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.event.ForgeEventFactory;
 
 public final class BloodmoonSpawner
 {
-	private static final int MOB_COUNT_DIV = (int) Math.pow(17.0D, 2.0D);
-	private final Set eligibleChunksForSpawning = Sets.newHashSet();
-	private static final String __OBFID = "CL_00000152";
+    private static final int MOB_COUNT_DIV = (int)Math.pow(17.0D, 2.0D);
+    private final Set<ChunkCoordIntPair> eligibleChunksForSpawning = Sets.<ChunkCoordIntPair>newHashSet();
 
-	public int findChunksForSpawning(WorldServer worldObj, boolean p_77192_2_)
-	{
-		if (!p_77192_2_)
-		{
-			return 0;
-		}
-		else
-		{
-			this.eligibleChunksForSpawning.clear();
-			int chunkCount = 0;
-			Iterator iterator = worldObj.playerEntities.iterator();
-			int k;
-			int i1;
+    /**
+     * adds all chunks within the spawn radius of the players to eligibleChunksForSpawning. pars: the world,
+     * hostileCreatures, passiveCreatures. returns number of eligible chunks.
+     */
+    public int findChunksForSpawning(WorldServer p_77192_1_, boolean spawnHostileMobs, boolean spawnPeacefulMobs, boolean p_77192_4_)
+    {
+        if (!spawnHostileMobs && !spawnPeacefulMobs)
+        {
+            return 0;
+        }
+        else
+        {
+            this.eligibleChunksForSpawning.clear();
+            int i = 0;
 
-			while (iterator.hasNext())
-			{
-				EntityPlayer entityplayer = (EntityPlayer) iterator.next();
+            for (EntityPlayer entityplayer : p_77192_1_.playerEntities)
+            {
+                if (!entityplayer.isSpectator())
+                {
+                    int j = MathHelper.floor_double(entityplayer.posX / 16.0D);
+                    int k = MathHelper.floor_double(entityplayer.posZ / 16.0D);
+                    int l = 8;
 
-				if (!entityplayer.isSpectator())
-				{
-					int j = MathHelper.floor_double(entityplayer.posX / 16.0D);
-					k = MathHelper.floor_double(entityplayer.posZ / 16.0D);
-					byte b0 = 8;
+                    for (int i1 = -l; i1 <= l; ++i1)
+                    {
+                        for (int j1 = -l; j1 <= l; ++j1)
+                        {
+                            boolean flag = i1 == -l || i1 == l || j1 == -l || j1 == l;
+                            ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(i1 + j, j1 + k);
 
-					for (int l = -b0; l <= b0; ++l)
-					{
-						for (i1 = -b0; i1 <= b0; ++i1)
-						{
-							boolean flag3 = l == -b0 || l == b0 || i1 == -b0 || i1 == b0;
-							ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(l + j, i1 + k);
+                            if (!this.eligibleChunksForSpawning.contains(chunkcoordintpair))
+                            {
+                                ++i;
 
-							if (!this.eligibleChunksForSpawning.contains(chunkcoordintpair))
-							{
-								++chunkCount;
+                                if (!flag && p_77192_1_.getWorldBorder().contains(chunkcoordintpair))
+                                {
+                                    this.eligibleChunksForSpawning.add(chunkcoordintpair);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-								if (!flag3 && worldObj.getWorldBorder().contains(chunkcoordintpair))
-								{
-									this.eligibleChunksForSpawning.add(chunkcoordintpair);
-								}
-							}
-						}
-					}
-				}
-			}
+            int i4 = 0;
+            BlockPos blockpos2 = p_77192_1_.getSpawnPoint();
 
-			int k3 = 0;
-			BlockPos blockpos2 = worldObj.getSpawnPoint();
-			EnumCreatureType[] aenumcreaturetype = EnumCreatureType.values();
-			k = aenumcreaturetype.length;
+            for (EnumCreatureType enumcreaturetype : EnumCreatureType.values())
+            {
+                if ((!enumcreaturetype.getPeacefulCreature() || spawnPeacefulMobs) && (enumcreaturetype.getPeacefulCreature() || spawnHostileMobs) && (!enumcreaturetype.getAnimal() || p_77192_4_))
+                {
+                    int j4 = p_77192_1_.countEntities(enumcreaturetype, true);
+                    int spawnLimit = enumcreaturetype.getMaxNumberOfCreature() * i / MOB_COUNT_DIV;
+                    spawnLimit *= BloodmoonConfig.SPAWN_LIMIT_MULT;
 
-			for (int l3 = 0; l3 < k; ++l3)
-			{
-				EnumCreatureType enumcreaturetype = aenumcreaturetype[l3];
+                    if (j4 <= spawnLimit)
+                    {
+                        java.util.ArrayList<ChunkCoordIntPair> shuffled = com.google.common.collect.Lists.newArrayList(this.eligibleChunksForSpawning);
+                        java.util.Collections.shuffle(shuffled);
+                        label374:
+                        for (ChunkCoordIntPair chunkcoordintpair1 : shuffled)
+                        {
+                            BlockPos blockpos = getRandomChunkPosition(p_77192_1_, chunkcoordintpair1.chunkXPos, chunkcoordintpair1.chunkZPos);
+                            int k1 = blockpos.getX();
+                            int l1 = blockpos.getY();
+                            int i2 = blockpos.getZ();
+                            Block block = p_77192_1_.getBlockState(blockpos).getBlock();
 
-				if (!enumcreaturetype.getPeacefulCreature())
-				{
-					i1 = worldObj.countEntities(enumcreaturetype, true);
-					int spawnLimit = enumcreaturetype.getMaxNumberOfCreature() * chunkCount / MOB_COUNT_DIV;
-					spawnLimit *= BloodmoonConfig.SPAWN_LIMIT_MULT;
+                            if (!block.isNormalCube())
+                            {
+                                int j2 = 0;
 
-					if (i1 <= spawnLimit)
-					{
-						Iterator iterator1 = this.eligibleChunksForSpawning.iterator();
-						ArrayList<ChunkCoordIntPair> tmp = new ArrayList(eligibleChunksForSpawning);
-						Collections.shuffle(tmp);
-						iterator1 = tmp.iterator();
-						label115:
+                                for (int k2 = 0; k2 < 3; ++k2)
+                                {
+                                    int l2 = k1;
+                                    int i3 = l1;
+                                    int j3 = i2;
+                                    int k3 = 6;
+                                    BiomeGenBase.SpawnListEntry biomegenbase$spawnlistentry = null;
+                                    IEntityLivingData ientitylivingdata = null;
 
-						while (iterator1.hasNext())
-						{
-							ChunkCoordIntPair chunkcoordintpair1 = (ChunkCoordIntPair) iterator1.next();
-							BlockPos blockpos = getRandomChunkPosition(worldObj, chunkcoordintpair1.chunkXPos, chunkcoordintpair1.chunkZPos);
-							int j1 = blockpos.getX();
-							int k1 = blockpos.getY();
-							int l1 = blockpos.getZ();
-							Block block = worldObj.getBlockState(blockpos).getBlock();
+                                    for (int l3 = 0; l3 < 4; ++l3)
+                                    {
+                                        l2 += p_77192_1_.rand.nextInt(k3) - p_77192_1_.rand.nextInt(k3);
+                                        i3 += p_77192_1_.rand.nextInt(1) - p_77192_1_.rand.nextInt(1);
+                                        j3 += p_77192_1_.rand.nextInt(k3) - p_77192_1_.rand.nextInt(k3);
+                                        BlockPos blockpos1 = new BlockPos(l2, i3, j3);
+                                        float f = (float)l2 + 0.5F;
+                                        float f1 = (float)j3 + 0.5F;
 
-							if (!block.isNormalCube() && worldObj.canBlockSeeSky(blockpos))
-							{
-								int i2 = 0;
-								int j2 = 0;
+                                        if (!p_77192_1_.isAnyPlayerWithinRangeAt((double)f, (double)i3, (double)f1, BloodmoonConfig.SPAWN_RANGE) && blockpos2.distanceSq((double)f, (double)i3, (double)f1) >= (BloodmoonConfig.SPAWN_DISTANCE*BloodmoonConfig.SPAWN_DISTANCE)) // TODO: Option to allow monsters to spawn closer to spawn
+                                        {
+                                            if (biomegenbase$spawnlistentry == null)
+                                            {
+                                                biomegenbase$spawnlistentry = p_77192_1_.getSpawnListEntryForTypeAt(enumcreaturetype, blockpos1);
 
-								while (j2 < 3)
-								{
-									int k2 = j1;
-									int l2 = k1;
-									int i3 = l1;
-									byte b1 = 6;
-									BiomeGenBase.SpawnListEntry spawnlistentry = null;
-									IEntityLivingData ientitylivingdata = null;
-									int j3 = 0;
+                                                if (biomegenbase$spawnlistentry == null)
+                                                {
+                                                    break;
+                                                }
+                                            }
 
-									while (true)
-									{
-										if (j3 < 4)
-										{
-											label108:
-											{
-												k2 += worldObj.rand.nextInt(b1) - worldObj.rand.nextInt(b1);
-												l2 += worldObj.rand.nextInt(1) - worldObj.rand.nextInt(1);
-												i3 += worldObj.rand.nextInt(b1) - worldObj.rand.nextInt(b1);
-												BlockPos blockpos1 = new BlockPos(k2, l2, i3);
-												float f = (float) k2 + 0.5F;
-												float f1 = (float) i3 + 0.5F;
+                                            if (p_77192_1_.canCreatureTypeSpawnHere(enumcreaturetype, biomegenbase$spawnlistentry, blockpos1) && canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.getPlacementForEntity(biomegenbase$spawnlistentry.entityClass), p_77192_1_, blockpos1))
+                                            {
+                                                EntityLiving entityliving;
 
-												if (!worldObj.func_175636_b((double) f, (double) l2, (double) f1, BloodmoonConfig.SPAWN_RANGE) && blockpos2.distanceSq((double) f, (double) l2, (double) f1) >= 576.0D)
-												{
-													if (spawnlistentry == null)
-													{
-														spawnlistentry = worldObj.func_175734_a(enumcreaturetype, blockpos1);
+                                                try
+                                                {
+                                                    entityliving = (EntityLiving)biomegenbase$spawnlistentry.entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {p_77192_1_});
+                                                }
+                                                catch (Exception exception)
+                                                {
+                                                    exception.printStackTrace();
+                                                    return i4;
+                                                }
 
-														if (spawnlistentry == null)
-														{
-															break label108;
-														}
-													}
+                                                entityliving.setLocationAndAngles((double)f, (double)i3, (double)f1, p_77192_1_.rand.nextFloat() * 360.0F, 0.0F);
 
-													if (worldObj.func_175732_a(enumcreaturetype, spawnlistentry, blockpos1) && canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.func_180109_a(spawnlistentry.entityClass), worldObj, blockpos1))
-													{
-														EntityLiving entityliving;
+                                                net.minecraftforge.fml.common.eventhandler.Event.Result canSpawn = net.minecraftforge.event.ForgeEventFactory.canEntitySpawn(entityliving, p_77192_1_, f, l2, f1);
+                                                if (canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.ALLOW || (canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.DEFAULT && (entityliving.getCanSpawnHere() && entityliving.isNotColliding())))
+                                                {
+                                                    if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityliving, p_77192_1_, f1, l2, f1))
+                                                    ientitylivingdata = entityliving.onInitialSpawn(p_77192_1_.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
 
-														try
-														{
-															entityliving = (EntityLiving) spawnlistentry.entityClass.getConstructor(new Class[] { World.class }).newInstance(new Object[] { worldObj });
-														}
-														catch (Exception exception)
-														{
-															exception.printStackTrace();
-															return k3;
-														}
+                                                    if (entityliving.isNotColliding())
+                                                    {
+                                                        ++j2;
+                                                        entityliving.getEntityData().setBoolean("bloodmoonSpawned", true);
+                                                        
+                                                        p_77192_1_.spawnEntityInWorld(entityliving);
+                                                    }
 
-														if (BloodmoonConfig.VANISH)
-														{
-															entityliving.getEntityData().setBoolean("bloodmoonSpawned", true);
-														}
-														
-														PacketHandler.INSTANCE.sendToAll(new MessageSpawnParticles(entityliving.getEntityBoundingBox()).setPosition(entityliving.posX, entityliving.posY, entityliving.posZ));
-														
-														entityliving.setLocationAndAngles((double) f, (double) l2, (double) f1, worldObj.rand.nextFloat() * 360.0F, 0.0F);
+                                                    if (i2 >= net.minecraftforge.event.ForgeEventFactory.getMaxSpawnPackSize(entityliving))
+                                                    {
+                                                        continue label374;
+                                                    }
+                                                }
 
-														Result canSpawn = ForgeEventFactory.canEntitySpawn(entityliving, worldObj, f, l2, f1);
-														if (canSpawn == Result.ALLOW || (canSpawn == Result.DEFAULT && (entityliving.getCanSpawnHere() && entityliving.handleLavaMovement())))
-														{
-															if (!ForgeEventFactory.doSpecialSpawn(entityliving, worldObj, f1, l2, f1))
-																ientitylivingdata = entityliving.func_180482_a(worldObj.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
+                                                i4 += j2;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-															if (entityliving.handleLavaMovement())
-															{
-																++i2;
-																worldObj.spawnEntityInWorld(entityliving);
-															}
+            return i4;
+        }
+    }
 
-															if (i2 >= ForgeEventFactory.getMaxSpawnPackSize(entityliving))
-															{
-																continue label115;
-															}
-														}
+    protected static BlockPos getRandomChunkPosition(World worldIn, int x, int z)
+    {
+        Chunk chunk = worldIn.getChunkFromChunkCoords(x, z);
+        int i = x * 16 + worldIn.rand.nextInt(16);
+        int j = z * 16 + worldIn.rand.nextInt(16);
+        int k = MathHelper.func_154354_b(chunk.getHeight(new BlockPos(i, 0, j)) + 1, 16);
+        int l = worldIn.rand.nextInt(k > 0 ? k : chunk.getTopFilledSegment() + 16 - 1);
+        return new BlockPos(i, l, j);
+    }
 
-														k3 += i2;
-													}
-												}
+    public static boolean canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType p_180267_0_, World worldIn, BlockPos pos)
+    {
+        if (!worldIn.getWorldBorder().contains(pos))
+        {
+            return false;
+        }
+        else
+        {
+            Block block = worldIn.getBlockState(pos).getBlock();
 
-												++j3;
-												continue;
-											}
-										}
+            if (p_180267_0_ == EntityLiving.SpawnPlacementType.IN_WATER)
+            {
+                return block.getMaterial().isLiquid() && worldIn.getBlockState(pos.down()).getBlock().getMaterial().isLiquid() && !worldIn.getBlockState(pos.up()).getBlock().isNormalCube();
+            }
+            else
+            {
+                BlockPos blockpos = pos.down();
 
-										++j2;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+                if (!worldIn.getBlockState(blockpos).getBlock().canCreatureSpawn(worldIn, blockpos, p_180267_0_))
+                {
+                    return false;
+                }
+                else
+                {
+                    Block block1 = worldIn.getBlockState(blockpos).getBlock();
+                    boolean flag = block1 != Blocks.bedrock && block1 != Blocks.barrier;
+                    return flag && !block.isNormalCube() && !block.getMaterial().isLiquid() && !worldIn.getBlockState(pos.up()).getBlock().isNormalCube();
+                }
+            }
+        }
+    }
 
-			return k3;
-		}
-	}
+    /**
+     * Called during chunk generation to spawn initial creatures.
+     */
+    public static void performWorldGenSpawning(World worldIn, BiomeGenBase p_77191_1_, int p_77191_2_, int p_77191_3_, int p_77191_4_, int p_77191_5_, Random p_77191_6_)
+    {
+        List<BiomeGenBase.SpawnListEntry> list = p_77191_1_.getSpawnableList(EnumCreatureType.CREATURE);
 
-	protected static BlockPos getRandomChunkPosition(World worldIn, int x, int z)
-	{
-		Chunk chunk = worldIn.getChunkFromChunkCoords(x, z);
-		int k = x * 16 + worldIn.rand.nextInt(16);
-		int l = z * 16 + worldIn.rand.nextInt(16);
-		int i1 = MathHelper.func_154354_b(chunk.getHeight(new BlockPos(k, 0, l)) + 1, 16);
-		int j1 = worldIn.rand.nextInt(i1 > 0 ? i1 : chunk.getTopFilledSegment() + 16 - 1);
-		return new BlockPos(k, j1, l);
-	}
+        if (!list.isEmpty())
+        {
+            while (p_77191_6_.nextFloat() < p_77191_1_.getSpawningChance())
+            {
+                BiomeGenBase.SpawnListEntry biomegenbase$spawnlistentry = (BiomeGenBase.SpawnListEntry)WeightedRandom.getRandomItem(worldIn.rand, list);
+                int i = biomegenbase$spawnlistentry.minGroupCount + p_77191_6_.nextInt(1 + biomegenbase$spawnlistentry.maxGroupCount - biomegenbase$spawnlistentry.minGroupCount);
+                IEntityLivingData ientitylivingdata = null;
+                int j = p_77191_2_ + p_77191_6_.nextInt(p_77191_4_);
+                int k = p_77191_3_ + p_77191_6_.nextInt(p_77191_5_);
+                int l = j;
+                int i1 = k;
 
-	public static boolean canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType p_180267_0_, World worldIn, BlockPos pos)
-	{
-		if (!worldIn.getWorldBorder().contains(pos))
-		{
-			return false;
-		}
-		else
-		{
-			Block block = worldIn.getBlockState(pos).getBlock();
+                for (int j1 = 0; j1 < i; ++j1)
+                {
+                    boolean flag = false;
 
-			if (p_180267_0_ == EntityLiving.SpawnPlacementType.IN_WATER)
-			{
-				return block.getMaterial().isLiquid() && worldIn.getBlockState(pos.down()).getBlock().getMaterial().isLiquid() && !worldIn.getBlockState(pos.up()).getBlock().isNormalCube();
-			}
-			else
-			{
-				BlockPos blockpos1 = pos.down();
+                    for (int k1 = 0; !flag && k1 < 4; ++k1)
+                    {
+                        BlockPos blockpos = worldIn.getTopSolidOrLiquidBlock(new BlockPos(j, 0, k));
 
-				if (!worldIn.getBlockState(blockpos1).getBlock().canCreatureSpawn(worldIn, blockpos1, p_180267_0_))
-				{
-					return false;
-				}
-				else
-				{
-					Block block1 = worldIn.getBlockState(blockpos1).getBlock();
-					boolean flag = block1 != Blocks.bedrock && block1 != Blocks.barrier;
-					return flag && !block.isNormalCube() && !block.getMaterial().isLiquid() && !worldIn.getBlockState(pos.up()).getBlock().isNormalCube();
-				}
-			}
-		}
-	}
+                        if (canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, worldIn, blockpos))
+                        {
+                            EntityLiving entityliving;
 
-	public static void performWorldGenSpawning(World worldIn, BiomeGenBase p_77191_1_, int p_77191_2_, int p_77191_3_, int p_77191_4_, int p_77191_5_, Random p_77191_6_)
-	{
-		List list = p_77191_1_.getSpawnableList(EnumCreatureType.CREATURE);
+                            try
+                            {
+                                entityliving = (EntityLiving)biomegenbase$spawnlistentry.entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] {worldIn});
+                            }
+                            catch (Exception exception)
+                            {
+                                exception.printStackTrace();
+                                continue;
+                            }
 
-		if (!list.isEmpty())
-		{
-			while (p_77191_6_.nextFloat() < p_77191_1_.getSpawningChance())
-			{
-				BiomeGenBase.SpawnListEntry spawnlistentry = (BiomeGenBase.SpawnListEntry) WeightedRandom.getRandomItem(worldIn.rand, list);
-				int i1 = spawnlistentry.minGroupCount + p_77191_6_.nextInt(1 + spawnlistentry.maxGroupCount - spawnlistentry.minGroupCount);
-				IEntityLivingData ientitylivingdata = null;
-				int j1 = p_77191_2_ + p_77191_6_.nextInt(p_77191_4_);
-				int k1 = p_77191_3_ + p_77191_6_.nextInt(p_77191_5_);
-				int l1 = j1;
-				int i2 = k1;
+                            entityliving.setLocationAndAngles((double)((float)j + 0.5F), (double)blockpos.getY(), (double)((float)k + 0.5F), p_77191_6_.nextFloat() * 360.0F, 0.0F);
+                            worldIn.spawnEntityInWorld(entityliving);
+                            ientitylivingdata = entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
+                            flag = true;
+                        }
 
-				for (int j2 = 0; j2 < i1; ++j2)
-				{
-					boolean flag = false;
+                        j += p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5);
 
-					for (int k2 = 0; !flag && k2 < 4; ++k2)
-					{
-						BlockPos blockpos = worldIn.getTopSolidOrLiquidBlock(new BlockPos(j1, 0, k1));
-
-						if (canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, worldIn, blockpos))
-						{
-							EntityLiving entityliving;
-
-							try
-							{
-								entityliving = (EntityLiving) spawnlistentry.entityClass.getConstructor(new Class[] { World.class }).newInstance(new Object[] { worldIn });
-							}
-							catch (Exception exception)
-							{
-								exception.printStackTrace();
-								continue;
-							}
-
-							entityliving.setLocationAndAngles((double) ((float) j1 + 0.5F), (double) blockpos.getY(), (double) ((float) k1 + 0.5F), p_77191_6_.nextFloat() * 360.0F, 0.0F);
-							worldIn.spawnEntityInWorld(entityliving);
-							ientitylivingdata = entityliving.func_180482_a(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
-							flag = true;
-						}
-
-						j1 += p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5);
-
-						for (k1 += p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5); j1 < p_77191_2_ || j1 >= p_77191_2_ + p_77191_4_ || k1 < p_77191_3_ || k1 >= p_77191_3_ + p_77191_4_; k1 = i2 + p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5))
-						{
-							j1 = l1 + p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5);
-						}
-					}
-				}
-			}
-		}
-	}
+                        for (k += p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5); j < p_77191_2_ || j >= p_77191_2_ + p_77191_4_ || k < p_77191_3_ || k >= p_77191_3_ + p_77191_4_; k = i1 + p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5))
+                        {
+                            j = l + p_77191_6_.nextInt(5) - p_77191_6_.nextInt(5);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
