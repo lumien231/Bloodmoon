@@ -24,7 +24,9 @@ public class BloodmoonHandler extends WorldSavedData
 
 	boolean bloodMoon;
 	boolean forceBloodMoon;
-	
+
+	int nightCounter;
+
 	public BloodmoonHandler()
 	{
 		super("Bloodmoon");
@@ -79,7 +81,19 @@ public class BloodmoonHandler extends WorldSavedData
 				{
 					if (time == 12000)
 					{
-						if (forceBloodMoon || Math.random() < BloodmoonConfig.CHANCE)
+						if (BloodmoonConfig.NTH_NIGHT != 0)
+						{
+							nightCounter--;
+
+							if (nightCounter < 0)
+							{
+								nightCounter = BloodmoonConfig.NTH_NIGHT;
+							}
+
+							this.markDirty();
+						}
+
+						if (forceBloodMoon || Math.random() < BloodmoonConfig.CHANCE || (BloodmoonConfig.FULLMOON && world.getMoonPhase() == 0) || (BloodmoonConfig.NTH_NIGHT != 0 && nightCounter == 0))
 						{
 							forceBloodMoon = false;
 							setBloodmoon(true);
@@ -91,6 +105,12 @@ public class BloodmoonHandler extends WorldSavedData
 									EntityPlayer player = (EntityPlayer) object;
 									player.addChatMessage(new TextComponentTranslation("text.bloodmoon.notify", new Object[0]).setStyle(new Style().setColor(TextFormatting.RED)));
 								}
+							}
+
+							if (nightCounter == 0 && BloodmoonConfig.NTH_NIGHT != 0)
+							{
+								nightCounter = BloodmoonConfig.NTH_NIGHT;
+								this.markDirty();
 							}
 						}
 					}
@@ -130,6 +150,7 @@ public class BloodmoonHandler extends WorldSavedData
 	{
 		this.bloodMoon = nbt.getBoolean("bloodMoon");
 		this.forceBloodMoon = nbt.getBoolean("forceBloodMoon");
+		this.nightCounter = nbt.getInteger("nightCounter");
 	}
 
 	@Override
@@ -137,7 +158,8 @@ public class BloodmoonHandler extends WorldSavedData
 	{
 		nbt.setBoolean("bloodMoon", bloodMoon);
 		nbt.setBoolean("forceBloodMoon", forceBloodMoon);
-		
+		nbt.setInteger("nightCounter", nightCounter);
+
 		return nbt;
 	}
 

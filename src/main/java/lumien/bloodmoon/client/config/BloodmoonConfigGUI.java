@@ -22,6 +22,7 @@ public class BloodmoonConfigGUI extends GuiConfig
 	{
 		List<IConfigElement> list = new ArrayList<IConfigElement>();
 		list.add(new DummyCategoryElement("General", "General", new ConfigElement(BloodmoonConfig.cfg.getCategory("general")).getChildElements()));
+		list.add(new DummyCategoryElement("Schedule", "Schedule", new ConfigElement(BloodmoonConfig.cfg.getCategory("schedule")).getChildElements()));
 		list.add(new DummyCategoryElement("Visuals", "Visuals", new ConfigElement(BloodmoonConfig.cfg.getCategory("visuals")).getChildElements()));
 		return list;
 	}

@@ -30,9 +30,6 @@ public class BloodmoonConfig
 	Property BLACK_FOG_PROPERTY;
 	public static boolean BLACK_FOG = true;
 
-	Property CHANCE_PROPERTY;
-	public static double CHANCE;
-
 	Property SPAWN_SPEED_PROPERTY;
 	public static int SPAWN_SPEED;
 
@@ -41,7 +38,7 @@ public class BloodmoonConfig
 
 	Property SPAWN_RANGE_PROPERTY;
 	public static int SPAWN_RANGE;
-	
+
 	Property SPAWN_DISTANCE_PROPERTY;
 	public static int SPAWN_DISTANCE;
 
@@ -56,31 +53,44 @@ public class BloodmoonConfig
 
 	Property SEND_MESSAGE_PROPERTY;
 	public static boolean SEND_MESSAGE;
-	
+
 	Property SPAWN_WHITELIST_PROPERTY;
 	public static Set<String> SPAWN_WHITELIST = new HashSet<String>();
+
+	// Schedule
+	Property CHANCE_PROPERTY;
+	public static double CHANCE;
+
+	Property FULLMOON_PROPERTY;
+	public static boolean FULLMOON;
+
+	Property NTH_NIGHT_PROPERTY;
+	public static int NTH_NIGHT;
 
 	public void preInit(FMLPreInitializationEvent event)
 	{
 		cfg = new Configuration(event.getSuggestedConfigurationFile());
 		cfg.load();
 
-		CHANCE_PROPERTY = cfg.get("General", "Chance", 0.05, "The chance of a bloodmoon occuring (0=Never;1=Every night;0.05=5% of all nights)");
 		SPAWN_SPEED_PROPERTY = cfg.get("General", "SpawnSpeed", 4, "How much faster enemys spawn on a bloodmoon (0=Vanilla)");
 		SPAWN_LIMIT_MULT_PROPERTY = cfg.get("General", "SpawnLimitMultiplier", 4, "With which number should the default entity limit be multiplicated on a blood moon");
 		SPAWN_RANGE_PROPERTY = cfg.get("General", "SpawnRange", 2, "How close can enemys spawn next to the player on a bloodmoon in blocks? (Vanilla=24)");
-		SPAWN_DISTANCE_PROPERTY = cfg.get("General", "WorldSpawnDistance", 24,"How close can enemys spawn next to the World Spawn (Vanilla=24)");
+		SPAWN_DISTANCE_PROPERTY = cfg.get("General", "WorldSpawnDistance", 24, "How close can enemys spawn next to the World Spawn (Vanilla=24)");
 		NO_SLEEP_PROPERTY = cfg.get("General", "NoSleep", true, "Whether players are not able to sleep on a bloodmoon");
 		VANISH_PROPERTY = cfg.get("General", "Vanish", false, "Whether monsters spawned by a bloodmoon should die at dawn");
 		RESPECT_GAMERULE_PROPERTY = cfg.get("General", "RespectGamerule", true, "Whether bloodmoons should respect the doMobSpawning gamerule");
 		SEND_MESSAGE_PROPERTY = cfg.get("General", "SendMessage", true, "Whether all players in the overworld should receive a message when the bloodmoon starts");
-		SPAWN_WHITELIST_PROPERTY = cfg.get("General", "SpawnWhitelist", "","If this isn't empty only monsters which names are in this list will get spawned by the bloodmoon. (Example: \"Skeleton,Spider\")");
-		
+		SPAWN_WHITELIST_PROPERTY = cfg.get("General", "SpawnWhitelist", "", "If this isn't empty only monsters which names are in this list will get spawned by the bloodmoon. (Example: \"Skeleton,Spider\")");
+
+		CHANCE_PROPERTY = cfg.get("Schedule", "Chance", 0.05, "The chance of a bloodmoon occuring at the beginning of a night (0=Never;1=Every night;0.05=5% of all nights)");
+		FULLMOON_PROPERTY = cfg.get("Schedule", "Fullmoon", false, "Whether there should be a bloodmoon whenever there is a full moon");
+		NTH_NIGHT_PROPERTY = cfg.get("Schedule", "NthNight", 0, "Every nth night there will be a bloodmoon (0 disables this, 1 would be every night, 2 every second night)");
+
 		RED_MOON_PROPERTY = cfg.get("Visuals", "RedMoon", true);
 		RED_SKY_PROPERTY = cfg.get("Visuals", "RedSky", true);
 		RED_LIGHT_PROPERTY = cfg.get("Visuals", "RedLight", true);
 		BLACK_FOG_PROPERTY = cfg.get("Visuals", "BlackFog", true);
-		
+
 		syncConfig();
 	}
 
@@ -95,6 +105,9 @@ public class BloodmoonConfig
 	public void syncConfig()
 	{
 		CHANCE = CHANCE_PROPERTY.getDouble();
+		FULLMOON = FULLMOON_PROPERTY.getBoolean();
+		NTH_NIGHT = NTH_NIGHT_PROPERTY.getInt();
+
 		SPAWN_SPEED = SPAWN_SPEED_PROPERTY.getInt();
 		SPAWN_LIMIT_MULT = SPAWN_LIMIT_MULT_PROPERTY.getInt();
 		SPAWN_RANGE = SPAWN_RANGE_PROPERTY.getInt();
@@ -104,28 +117,28 @@ public class BloodmoonConfig
 		RESPECT_GAMERULE = RESPECT_GAMERULE_PROPERTY.getBoolean();
 		SEND_MESSAGE = SEND_MESSAGE_PROPERTY.getBoolean();
 		SPAWN_WHITELIST.clear();
-		
+
 		if (!SPAWN_WHITELIST_PROPERTY.getString().isEmpty())
 		{
 			SPAWN_WHITELIST.addAll(Arrays.asList(SPAWN_WHITELIST_PROPERTY.getString().split(",")));
 		}
-		
+
 		RED_MOON = RED_MOON_PROPERTY.getBoolean();
 		RED_SKY = RED_SKY_PROPERTY.getBoolean();
 		RED_LIGHT = RED_LIGHT_PROPERTY.getBoolean();
 		BLACK_FOG = BLACK_FOG_PROPERTY.getBoolean();
-		
+
 		if (cfg.hasChanged())
 		{
 			cfg.save();
 		}
 	}
-	
+
 	public boolean canSpawn(Class<? extends Entity> entityClass)
 	{
 		return SPAWN_WHITELIST.isEmpty() || SPAWN_WHITELIST.contains(getEntityName(entityClass));
 	}
-	
+
 	public String getEntityName(Class<? extends Entity> entityClass)
 	{
 		String entityName = null;
