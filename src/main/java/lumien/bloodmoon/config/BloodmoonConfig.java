@@ -1,10 +1,18 @@
 package lumien.bloodmoon.config;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import lumien.bloodmoon.Bloodmoon;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
+import scala.actors.threadpool.Arrays;
 
 public class BloodmoonConfig
 {
@@ -48,6 +56,9 @@ public class BloodmoonConfig
 
 	Property SEND_MESSAGE_PROPERTY;
 	public static boolean SEND_MESSAGE;
+	
+	Property SPAWN_WHITELIST_PROPERTY;
+	public static Set<String> SPAWN_WHITELIST = new HashSet<String>();
 
 	public void preInit(FMLPreInitializationEvent event)
 	{
@@ -63,7 +74,8 @@ public class BloodmoonConfig
 		VANISH_PROPERTY = cfg.get("General", "Vanish", false, "Whether monsters spawned by a bloodmoon should die at dawn");
 		RESPECT_GAMERULE_PROPERTY = cfg.get("General", "RespectGamerule", true, "Whether bloodmoons should respect the doMobSpawning gamerule");
 		SEND_MESSAGE_PROPERTY = cfg.get("General", "SendMessage", true, "Whether all players in the overworld should receive a message when the bloodmoon starts");
-
+		SPAWN_WHITELIST_PROPERTY = cfg.get("General", "SpawnWhitelist", "","If this isn't empty only monsters which names are in this list will get spawned by the bloodmoon. (Example: \"Skeleton,Spider\")");
+		
 		RED_MOON_PROPERTY = cfg.get("Visuals", "RedMoon", true);
 		RED_SKY_PROPERTY = cfg.get("Visuals", "RedSky", true);
 		RED_LIGHT_PROPERTY = cfg.get("Visuals", "RedLight", true);
@@ -91,7 +103,13 @@ public class BloodmoonConfig
 		VANISH = VANISH_PROPERTY.getBoolean();
 		RESPECT_GAMERULE = RESPECT_GAMERULE_PROPERTY.getBoolean();
 		SEND_MESSAGE = SEND_MESSAGE_PROPERTY.getBoolean();
-
+		SPAWN_WHITELIST.clear();
+		
+		if (!SPAWN_WHITELIST_PROPERTY.getString().isEmpty())
+		{
+			SPAWN_WHITELIST.addAll(Arrays.asList(SPAWN_WHITELIST_PROPERTY.getString().split(",")));
+		}
+		
 		RED_MOON = RED_MOON_PROPERTY.getBoolean();
 		RED_SKY = RED_SKY_PROPERTY.getBoolean();
 		RED_LIGHT = RED_LIGHT_PROPERTY.getBoolean();
@@ -101,5 +119,28 @@ public class BloodmoonConfig
 		{
 			cfg.save();
 		}
+	}
+	
+	public boolean canSpawn(Class<? extends Entity> entityClass)
+	{
+		return SPAWN_WHITELIST.isEmpty() || SPAWN_WHITELIST.contains(getEntityName(entityClass));
+	}
+	
+	public String getEntityName(Class<? extends Entity> entityClass)
+	{
+		String entityName = null;
+		entityName = EntityList.getEntityStringFromClass(entityClass);
+
+		if (entityName == null)
+		{
+			EntityRegistration registration = EntityRegistry.instance().lookupModSpawn(entityClass, false);
+
+			if (registration != null)
+			{
+				entityName = registration.getEntityName();
+			}
+		}
+
+		return entityName;
 	}
 }

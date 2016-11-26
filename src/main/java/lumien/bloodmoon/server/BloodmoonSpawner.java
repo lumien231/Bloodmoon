@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import lumien.bloodmoon.Bloodmoon;
 import lumien.bloodmoon.config.BloodmoonConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
@@ -137,8 +138,9 @@ public final class BloodmoonSpawner
 											{
 												biomegenbase$spawnlistentry = worldServerIn.getSpawnListEntryForTypeAt(enumcreaturetype, blockpos$mutableblockpos);
 
-												if (biomegenbase$spawnlistentry == null)
+												if (biomegenbase$spawnlistentry == null || !Bloodmoon.config.canSpawn(biomegenbase$spawnlistentry.entityClass))
 												{
+													biomegenbase$spawnlistentry = null;
 													break;
 												}
 											}
