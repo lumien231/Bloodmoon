@@ -1,5 +1,6 @@
 package lumien.bloodmoon.config;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +13,6 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry.EntityRegistration;
-import scala.actors.threadpool.Arrays;
 
 public class BloodmoonConfig
 {
