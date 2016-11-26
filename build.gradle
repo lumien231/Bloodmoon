@@ -8,17 +8,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.4"
+version = "1.4.1"
 group= "lumien.bloodmoon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Bloodmoon-MC1.8.8"
+archivesBaseName = "Bloodmoon-MC1.10.2"
 
 minecraft {
-    version = "1.8.8-11.15.0.1609-1.8.8"
+    version = "1.10.2-12.18.2.2151"
     runDir = "eclipse"
     
     replaceIn "Bloodmoon.java"
@@ -29,7 +29,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not allways work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20151205"
+    mappings = "snapshot_20161111"
 }
 
 jar {

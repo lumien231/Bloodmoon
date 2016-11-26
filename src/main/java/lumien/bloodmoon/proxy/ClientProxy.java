@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy
-{	
+{
 	@Override
 	public void preInit(FMLPreInitializationEvent event)
 	{
@@ -15,7 +15,7 @@ public class ClientProxy extends CommonProxy
 		FMLCommonHandler.instance().bus().register(ClientBloodmoonHandler.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(ClientBloodmoonHandler.INSTANCE);
 	}
-	
+
 	@Override
 	public boolean isBloodmoon()
 	{

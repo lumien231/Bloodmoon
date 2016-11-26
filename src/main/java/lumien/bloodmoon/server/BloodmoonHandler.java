@@ -6,17 +6,14 @@ import lumien.bloodmoon.network.messages.MessageBloodmoonStatus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSavedData;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class BloodmoonHandler extends WorldSavedData
@@ -46,11 +43,11 @@ public class BloodmoonHandler extends WorldSavedData
 
 	public void playerJoinedWorld(EntityJoinWorldEvent event)
 	{
-		if (!event.world.isRemote && event.entity instanceof EntityPlayer)
+		if (!event.getWorld().isRemote && event.getEntity() instanceof EntityPlayer)
 		{
 			if (bloodMoon)
 			{
-				PacketHandler.INSTANCE.sendTo(new MessageBloodmoonStatus(bloodMoon), (EntityPlayerMP) event.entity);
+				PacketHandler.INSTANCE.sendTo(new MessageBloodmoonStatus(bloodMoon), (EntityPlayerMP) event.getEntity());
 			}
 		}
 	}
@@ -60,7 +57,7 @@ public class BloodmoonHandler extends WorldSavedData
 		if (event.side.isServer() && event.phase == TickEvent.Phase.END)
 		{
 			World world = event.world;
-			if (world.provider.getDimensionId() == 0)
+			if (world.provider.getDimension() == 0)
 			{
 				int time = (int) (world.getWorldTime() % 24000);
 				if (isBloodmoonActive())
@@ -92,7 +89,7 @@ public class BloodmoonHandler extends WorldSavedData
 								for (Object object : world.playerEntities)
 								{
 									EntityPlayer player = (EntityPlayer) object;
-									player.addChatMessage(new ChatComponentTranslation("text.bloodmoon.notify", new Object[0]).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+									player.addChatMessage(new TextComponentTranslation("text.bloodmoon.notify", new Object[0]).setStyle(new Style().setColor(TextFormatting.RED)));
 								}
 							}
 						}
@@ -136,10 +133,12 @@ public class BloodmoonHandler extends WorldSavedData
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound nbt)
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		nbt.setBoolean("bloodMoon", bloodMoon);
 		nbt.setBoolean("forceBloodMoon", forceBloodMoon);
+		
+		return nbt;
 	}
 
 	public boolean isBloodmoonScheduled()

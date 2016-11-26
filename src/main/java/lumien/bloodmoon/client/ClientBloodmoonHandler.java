@@ -1,16 +1,14 @@
 package lumien.bloodmoon.client;
 
-import lumien.bloodmoon.config.BloodmoonConfig;
-
 import org.lwjgl.opengl.GL11;
 
+import lumien.bloodmoon.config.BloodmoonConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.Side;
 
 public class ClientBloodmoonHandler
 {
@@ -53,7 +51,7 @@ public class ClientBloodmoonHandler
 		}
 	}
 
-	public void skyColorHook(Vec3 color)
+	public void skyColorHook(Vec3d color)
 	{
 		if (isBloodmoonActive() && BloodmoonConfig.RED_SKY)
 		{
@@ -109,8 +107,6 @@ public class ClientBloodmoonHandler
 			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
 			if (world != null && player != null)
 			{
-				double redDivisor = (player.posY / world.getActualHeight());
-
 				float difTime = (int) (world.getWorldTime() % 24000) - 12000;
 				sin = Math.sin(difTime * sinMax);
 				lightSub = (float) (sin * 150f);
@@ -119,7 +115,7 @@ public class ClientBloodmoonHandler
 
 				fogRemove = (float) (sin * d * 6000f);
 
-				if (world.provider.getDimensionId() != 0)
+				if (world.provider.getDimension() != 0)
 				{
 					bloodmoonActive = false;
 				}

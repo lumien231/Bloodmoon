@@ -4,11 +4,11 @@ import lumien.bloodmoon.Bloodmoon;
 import lumien.bloodmoon.client.ClientBloodmoonHandler;
 import lumien.bloodmoon.config.BloodmoonConfig;
 import lumien.bloodmoon.server.BloodmoonHandler;
-import net.minecraft.entity.player.EntityPlayer.EnumStatus;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
+import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogColors;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -26,9 +26,9 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void loadWorld(WorldEvent.Load event)
 	{
-		if (!event.world.isRemote && event.world.provider.getDimensionId() == 0)
+		if (!event.getWorld().isRemote && event.getWorld().provider.getDimension() == 0)
 		{
-			BloodmoonHandler.INSTANCE = (BloodmoonHandler) event.world.getMapStorage().loadData(BloodmoonHandler.class, "Bloodmoon");
+			BloodmoonHandler.INSTANCE = (BloodmoonHandler) event.getWorld().getMapStorage().getOrLoadData(BloodmoonHandler.class, "Bloodmoon");
 
 			if (BloodmoonHandler.INSTANCE == null)
 			{
@@ -36,7 +36,7 @@ public class BloodmoonEventHandler
 				BloodmoonHandler.INSTANCE.markDirty();
 			}
 
-			event.world.getMapStorage().setData("Bloodmoon", BloodmoonHandler.INSTANCE);
+			event.getWorld().getMapStorage().setData("Bloodmoon", BloodmoonHandler.INSTANCE);
 
 			BloodmoonHandler.INSTANCE.updateClients();
 		}
@@ -45,9 +45,9 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void livingDrops(LivingDropsEvent event)
 	{
-		if (!event.entityLiving.worldObj.isRemote)
+		if (!event.getEntityLiving().worldObj.isRemote)
 		{
-			if (event.source == DamageSource.outOfWorld && event.entityLiving.getEntityData().getBoolean("bloodmoonSpawned"))
+			if (event.getSource() == DamageSource.outOfWorld && event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
 			{
 				event.setCanceled(true);
 			}
@@ -57,11 +57,11 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void livingUpdate(LivingUpdateEvent event)
 	{
-		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.entityLiving.dimension == 0 && !event.entityLiving.worldObj.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.entityLiving.worldObj.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
+		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.getEntityLiving().dimension == 0 && !event.getEntityLiving().worldObj.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.getEntityLiving().worldObj.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
 		{
-			if (event.entityLiving.getEntityData().getBoolean("bloodmoonSpawned"))
+			if (event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
 			{
-				event.entityLiving.onKillCommand();
+				event.getEntityLiving().onKillCommand();
 			}
 		}
 	}
@@ -73,8 +73,8 @@ public class BloodmoonEventHandler
 		{
 			if (Bloodmoon.proxy.isBloodmoon())
 			{
-				event.result = EnumStatus.OTHER_PROBLEM;
-				event.entityPlayer.addChatMessage(new ChatComponentTranslation("text.bloodmoon.nosleep").setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+				event.setResult(SleepResult.OTHER_PROBLEM);
+				event.getEntityPlayer().addChatMessage(new TextComponentTranslation("text.bloodmoon.nosleep").setStyle(new Style().setColor(TextFormatting.RED)));
 			}
 		}
 	}
@@ -91,16 +91,16 @@ public class BloodmoonEventHandler
 	{
 		if (BloodmoonConfig.BLACK_FOG && ClientBloodmoonHandler.INSTANCE.isBloodmoonActive())
 		{
-			event.red = Math.max(event.red - ClientBloodmoonHandler.INSTANCE.fogRemove, 0);
-			event.green = Math.max(event.green - ClientBloodmoonHandler.INSTANCE.fogRemove, 0);
-			event.blue = Math.max(event.blue - ClientBloodmoonHandler.INSTANCE.fogRemove, 0);
+			event.setRed(Math.max(event.getRed() - ClientBloodmoonHandler.INSTANCE.fogRemove, 0));
+			event.setGreen(Math.max(event.getGreen() - ClientBloodmoonHandler.INSTANCE.fogRemove, 0));
+			event.setBlue(Math.max(event.getBlue() - ClientBloodmoonHandler.INSTANCE.fogRemove, 0));
 		}
 	}
 
 	@SubscribeEvent
 	public void playerJoinedWorld(EntityJoinWorldEvent event)
 	{
-		if (BloodmoonHandler.INSTANCE != null && !event.world.isRemote)
+		if (BloodmoonHandler.INSTANCE != null && !event.getWorld().isRemote)
 		{
 			BloodmoonHandler.INSTANCE.playerJoinedWorld(event);
 		}
