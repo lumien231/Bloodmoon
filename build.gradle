@@ -15,11 +15,15 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.5"
 group= "lumien.bloodmoon" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "Bloodmoon-MC1.10.2"
+
+sourceCompatibility = targetCompatibility = "1.6" // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.6"
+}
 
 minecraft {
-    version = "1.10.2-12.18.2.2151"
-    runDir = "eclipse"
+    version = "1.11-13.19.0.2160"
+    runDir = "run"
     
     replaceIn "Bloodmoon.java"
     replace "@VERSION@",project.version
@@ -31,6 +35,8 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20161111"
 }
+
+archivesBaseName = "Bloodmoon-MC" + minecraft.version
 
 jar {
     manifest {
