@@ -18,7 +18,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 @Mod(modid = Bloodmoon.MOD_ID,name = Bloodmoon.MOD_NAME,version = Bloodmoon.MOD_VERSION,guiFactory = "lumien.bloodmoon.client.config.BloodmoonGuiFactory")
 public class Bloodmoon
 {
-	public static final String MOD_ID = "Bloodmoon";
+	public static final String MOD_ID = "bloodmoon";
 	public static final String MOD_NAME = "Bloodmoon";
 	public static final String MOD_VERSION = "1.2";
 
