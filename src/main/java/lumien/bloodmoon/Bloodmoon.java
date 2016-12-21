@@ -20,7 +20,7 @@ public class Bloodmoon
 {
 	public static final String MOD_ID = "bloodmoon";
 	public static final String MOD_NAME = "Bloodmoon";
-	public static final String MOD_VERSION = "1.2";
+	public static final String MOD_VERSION = "1.5.1";
 
 	@Instance(value = "Bloodmoon")
 	public static Bloodmoon instance;
