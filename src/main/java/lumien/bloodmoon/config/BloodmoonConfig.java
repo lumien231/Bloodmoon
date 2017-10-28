@@ -142,7 +142,7 @@ public class BloodmoonConfig
 	public String getEntityName(Class<? extends Entity> entityClass)
 	{
 		String entityName = null;
-		entityName = EntityList.func_191302_a(EntityList.func_191306_a(entityClass));
+		entityName = EntityList.getTranslationName(EntityList.getKey(entityClass));
 
 		if (entityName == null)
 		{

@@ -45,9 +45,9 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void livingDrops(LivingDropsEvent event)
 	{
-		if (!event.getEntityLiving().worldObj.isRemote)
+		if (!event.getEntityLiving().world.isRemote)
 		{
-			if (event.getSource() == DamageSource.outOfWorld && event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
+			if (event.getSource() == DamageSource.OUT_OF_WORLD && event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
 			{
 				event.setCanceled(true);
 			}
@@ -57,7 +57,7 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void livingUpdate(LivingUpdateEvent event)
 	{
-		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.getEntityLiving().dimension == 0 && !event.getEntityLiving().worldObj.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.getEntityLiving().worldObj.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
+		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.getEntityLiving().dimension == 0 && !event.getEntityLiving().world.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.getEntityLiving().world.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
 		{
 			if (event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
 			{
@@ -74,7 +74,7 @@ public class BloodmoonEventHandler
 			if (Bloodmoon.proxy.isBloodmoon())
 			{
 				event.setResult(SleepResult.OTHER_PROBLEM);
-				event.getEntityPlayer().addChatMessage(new TextComponentTranslation("text.bloodmoon.nosleep").setStyle(new Style().setColor(TextFormatting.RED)));
+				event.getEntityPlayer().sendMessage(new TextComponentTranslation("text.bloodmoon.nosleep").setStyle(new Style().setColor(TextFormatting.RED)));
 			}
 		}
 	}

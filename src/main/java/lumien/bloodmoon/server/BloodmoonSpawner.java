@@ -52,8 +52,8 @@ public final class BloodmoonSpawner
 			{
 				if (!entityplayer.isSpectator())
 				{
-					int j = MathHelper.floor_double(entityplayer.posX / 16.0D);
-					int k = MathHelper.floor_double(entityplayer.posZ / 16.0D);
+					int j = MathHelper.floor(entityplayer.posX / 16.0D);
+					int k = MathHelper.floor(entityplayer.posZ / 16.0D);
 					int l = 8;
 
 					for (int i1 = -l; i1 <= l; ++i1)
@@ -121,7 +121,7 @@ public final class BloodmoonSpawner
 									int k3 = 6;
 									Biome.SpawnListEntry biomegenbase$spawnlistentry = null;
 									IEntityLivingData ientitylivingdata = null;
-									int l3 = MathHelper.ceiling_double_int(Math.random() * 4.0D);
+									int l3 = MathHelper.ceil(Math.random() * 4.0D);
 
 									for (int i4 = 0; i4 < l3; ++i4)
 									{
@@ -172,7 +172,7 @@ public final class BloodmoonSpawner
 														++j2;
 														entityliving.getEntityData().setBoolean("bloodmoonSpawned", true);
 
-														worldServerIn.spawnEntityInWorld(entityliving);
+														worldServerIn.spawnEntity(entityliving);
 													}
 													else
 													{
@@ -290,7 +290,7 @@ public final class BloodmoonSpawner
 							}
 
 							entityliving.setLocationAndAngles((double) ((float) j + 0.5F), (double) blockpos.getY(), (double) ((float) k + 0.5F), randomIn.nextFloat() * 360.0F, 0.0F);
-							worldIn.spawnEntityInWorld(entityliving);
+							worldIn.spawnEntity(entityliving);
 							ientitylivingdata = entityliving.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityliving)), ientitylivingdata);
 							flag = true;
 						}

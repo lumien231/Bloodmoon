@@ -22,7 +22,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 public class CommandBloodmoon extends CommandBase
 {
 	@Override
-	public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
+	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos)
 	{
 		List<String> suggestions = new ArrayList<String>();
 
@@ -43,13 +43,13 @@ public class CommandBloodmoon extends CommandBase
 	}
 
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "bloodmoon";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender sender)
+	public String getUsage(ICommandSender sender)
 	{
 		return "/bloodmoon <force|stop|entitynames>";
 	}
@@ -59,7 +59,7 @@ public class CommandBloodmoon extends CommandBase
 	{
 		if (args.length == 0)
 		{
-			throw new WrongUsageException(this.getCommandUsage(sender), new Object[0]);
+			throw new WrongUsageException(this.getUsage(sender), new Object[0]);
 		}
 		else
 		{
@@ -73,12 +73,12 @@ public class CommandBloodmoon extends CommandBase
 			if (subCommand.equals("force"))
 			{
 				BloodmoonHandler.INSTANCE.force();
-				sender.addChatMessage(new TextComponentTranslation("text.bloodmoon.force"));
+				sender.sendMessage(new TextComponentTranslation("text.bloodmoon.force"));
 			}
 			else if (subCommand.equals("stop"))
 			{
 				BloodmoonHandler.INSTANCE.stop();
-				sender.addChatMessage(new TextComponentTranslation("text.bloodmoon.stop"));
+				sender.sendMessage(new TextComponentTranslation("text.bloodmoon.stop"));
 			}
 			else if (subCommand.equals("entitynames"))
 			{
@@ -86,7 +86,7 @@ public class CommandBloodmoon extends CommandBase
 
 				Set<String> names = new HashSet<String>();
 
-				List<Entity> monsterNearby = senderEntity.worldObj.getEntitiesInAABBexcluding(senderEntity, senderEntity.getEntityBoundingBox().expand(10, 10, 10), EntitySelectors.NOT_SPECTATING);
+				List<Entity> monsterNearby = senderEntity.world.getEntitiesInAABBexcluding(senderEntity, senderEntity.getEntityBoundingBox().expand(10, 10, 10), EntitySelectors.NOT_SPECTATING);
 
 				for (Entity e : monsterNearby)
 				{
@@ -96,16 +96,16 @@ public class CommandBloodmoon extends CommandBase
 					}
 				}
 
-				sender.addChatMessage(new TextComponentTranslation("text.bloodmoon.entity"));
+				sender.sendMessage(new TextComponentTranslation("text.bloodmoon.entity"));
 
 				for (String s : names)
 				{
-					sender.addChatMessage(new TextComponentString(" - " + s));
+					sender.sendMessage(new TextComponentString(" - " + s));
 				}
 			}
 			else
 			{
-				throw new WrongUsageException(this.getCommandUsage(sender), new Object[0]);
+				throw new WrongUsageException(this.getUsage(sender), new Object[0]);
 			}
 		}
 	}

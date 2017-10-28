@@ -78,7 +78,6 @@ public class ClientBloodmoonHandler
 			}
 		}
 		return originalValue;
-
 	}
 
 	public int manipulateBlue(int position, int originalValue)
@@ -95,7 +94,6 @@ public class ClientBloodmoonHandler
 			}
 		}
 		return originalValue;
-
 	}
 
 	@SubscribeEvent
@@ -103,8 +101,8 @@ public class ClientBloodmoonHandler
 	{
 		if (isBloodmoonActive())
 		{
-			WorldClient world = Minecraft.getMinecraft().theWorld;
-			EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+			WorldClient world = Minecraft.getMinecraft().world;
+			EntityPlayerSP player = Minecraft.getMinecraft().player;
 			if (world != null && player != null)
 			{
 				float difTime = (int) (world.getWorldTime() % 24000) - 12000;
