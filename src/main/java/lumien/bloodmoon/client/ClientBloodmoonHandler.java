@@ -45,7 +45,7 @@ public class ClientBloodmoonHandler
 
 	public void moonColorHook()
 	{
-		if (isBloodmoonActive() && BloodmoonConfig.RED_MOON)
+		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_MOON)
 		{
 			GL11.glColor3f(0.8f, 0, 0);
 		}
@@ -53,9 +53,9 @@ public class ClientBloodmoonHandler
 
 	public void skyColorHook(Vec3d color)
 	{
-		if (isBloodmoonActive() && BloodmoonConfig.RED_SKY)
+		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_SKY)
 		{
-			color.xCoord += INSTANCE.skyColorAdd;
+			color.x += INSTANCE.skyColorAdd;
 		}
 	}
 
@@ -66,7 +66,7 @@ public class ClientBloodmoonHandler
 
 	public int manipulateGreen(int position, int originalValue)
 	{
-		if (isBloodmoonActive() && BloodmoonConfig.RED_LIGHT)
+		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_LIGHT)
 		{
 			int height = position / 16;
 
@@ -82,7 +82,7 @@ public class ClientBloodmoonHandler
 
 	public int manipulateBlue(int position, int originalValue)
 	{
-		if (isBloodmoonActive() && BloodmoonConfig.RED_LIGHT)
+		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_LIGHT)
 		{
 			int height = position / 16;
 

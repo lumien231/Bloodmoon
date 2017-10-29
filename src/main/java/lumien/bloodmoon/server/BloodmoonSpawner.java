@@ -69,7 +69,7 @@ public final class BloodmoonSpawner
 
 								if (!flag && worldServerIn.getWorldBorder().contains(chunkpos))
 								{
-									PlayerChunkMapEntry playermanager$playerinstance = worldServerIn.getPlayerChunkMap().getEntry(chunkpos.chunkXPos, chunkpos.chunkZPos);
+									PlayerChunkMapEntry playermanager$playerinstance = worldServerIn.getPlayerChunkMap().getEntry(chunkpos.x, chunkpos.z);
 
 									if (playermanager$playerinstance != null && playermanager$playerinstance.isSentToPlayers())
 									{
@@ -92,7 +92,7 @@ public final class BloodmoonSpawner
 					int k4 = worldServerIn.countEntities(enumcreaturetype, true);
 					int spawnLimit = enumcreaturetype.getMaxNumberOfCreature() * i / MOB_COUNT_DIV;
 
-					spawnLimit *= BloodmoonConfig.SPAWN_LIMIT_MULT;
+					spawnLimit *= BloodmoonConfig.SPAWNING.SPAWN_LIMIT_MULT;
 
 					if (k4 <= spawnLimit)
 					{
@@ -103,7 +103,7 @@ public final class BloodmoonSpawner
 
 						for (ChunkPos chunkcoordintpair1 : shuffled)
 						{
-							BlockPos blockpos = getRandomChunkPosition(worldServerIn, chunkcoordintpair1.chunkXPos, chunkcoordintpair1.chunkZPos);
+							BlockPos blockpos = getRandomChunkPosition(worldServerIn, chunkcoordintpair1.x, chunkcoordintpair1.z);
 							int k1 = blockpos.getX();
 							int l1 = blockpos.getY();
 							int i2 = blockpos.getZ();
@@ -132,13 +132,13 @@ public final class BloodmoonSpawner
 										float f = (float) l2 + 0.5F;
 										float f1 = (float) j3 + 0.5F;
 
-										if (worldServerIn.canBlockSeeSky(blockpos$mutableblockpos) && !worldServerIn.isAnyPlayerWithinRangeAt((double) f, (double) i3, (double) f1, BloodmoonConfig.SPAWN_RANGE) && blockpos1.distanceSq((double) f, (double) i3, (double) f1) >= (BloodmoonConfig.SPAWN_DISTANCE * BloodmoonConfig.SPAWN_DISTANCE))
+										if (worldServerIn.canBlockSeeSky(blockpos$mutableblockpos) && !worldServerIn.isAnyPlayerWithinRangeAt((double) f, (double) i3, (double) f1, BloodmoonConfig.SPAWNING.SPAWN_RANGE) && blockpos1.distanceSq((double) f, (double) i3, (double) f1) >= (BloodmoonConfig.SPAWNING.SPAWN_DISTANCE * BloodmoonConfig.SPAWNING.SPAWN_DISTANCE))
 										{
 											if (biomegenbase$spawnlistentry == null)
 											{
 												biomegenbase$spawnlistentry = worldServerIn.getSpawnListEntryForTypeAt(enumcreaturetype, blockpos$mutableblockpos);
 
-												if (biomegenbase$spawnlistentry == null || !Bloodmoon.config.canSpawn(biomegenbase$spawnlistentry.entityClass))
+												if (biomegenbase$spawnlistentry == null || !BloodmoonConfig.canSpawn(biomegenbase$spawnlistentry.entityClass))
 												{
 													biomegenbase$spawnlistentry = null;
 													break;
@@ -161,7 +161,7 @@ public final class BloodmoonSpawner
 
 												entityliving.setLocationAndAngles((double) f, (double) i3, (double) f1, worldServerIn.rand.nextFloat() * 360.0F, 0.0F);
 
-												net.minecraftforge.fml.common.eventhandler.Event.Result canSpawn = net.minecraftforge.event.ForgeEventFactory.canEntitySpawn(entityliving, worldServerIn, f, i3, f1);
+												net.minecraftforge.fml.common.eventhandler.Event.Result canSpawn = net.minecraftforge.event.ForgeEventFactory.canEntitySpawn(entityliving, worldServerIn, f, i3, f1, false);
 												if (canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.ALLOW || (canSpawn == net.minecraftforge.fml.common.eventhandler.Event.Result.DEFAULT && (entityliving.getCanSpawnHere() && entityliving.isNotColliding())))
 												{
 													if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entityliving, worldServerIn, f, l3, f1))

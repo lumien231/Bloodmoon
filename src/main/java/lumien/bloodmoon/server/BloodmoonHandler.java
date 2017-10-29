@@ -64,9 +64,9 @@ public class BloodmoonHandler extends WorldSavedData
 				int time = (int) (world.getWorldTime() % 24000);
 				if (isBloodmoonActive())
 				{
-					if (!BloodmoonConfig.RESPECT_GAMERULE || world.getGameRules().getBoolean("doMobSpawning"))
+					if (!BloodmoonConfig.GENERAL.RESPECT_GAMERULE || world.getGameRules().getBoolean("doMobSpawning"))
 					{
-						for (int i = 0; i < BloodmoonConfig.SPAWN_SPEED; i++)
+						for (int i = 0; i < BloodmoonConfig.SPAWNING.SPAWN_SPEED; i++)
 						{
 							bloodMoonSpawner.findChunksForSpawning((WorldServer) world, world.getDifficulty() != EnumDifficulty.PEACEFUL, false, false);
 						}
@@ -81,24 +81,24 @@ public class BloodmoonHandler extends WorldSavedData
 				{
 					if (time == 12000)
 					{
-						if (BloodmoonConfig.NTH_NIGHT != 0)
+						if (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0)
 						{
 							nightCounter--;
 
 							if (nightCounter < 0)
 							{
-								nightCounter = BloodmoonConfig.NTH_NIGHT;
+								nightCounter = BloodmoonConfig.SCHEDULE.NTH_NIGHT;
 							}
 
 							this.markDirty();
 						}
 
-						if (forceBloodMoon || Math.random() < BloodmoonConfig.CHANCE || (BloodmoonConfig.FULLMOON && world.getCurrentMoonPhaseFactor() == 1.0F) || (BloodmoonConfig.NTH_NIGHT != 0 && nightCounter == 0))
+						if (forceBloodMoon || Math.random() < BloodmoonConfig.SCHEDULE.CHANCE || (BloodmoonConfig.SCHEDULE.FULLMOON && world.getCurrentMoonPhaseFactor() == 1.0F) || (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0 && nightCounter == 0))
 						{
 							forceBloodMoon = false;
 							setBloodmoon(true);
 
-							if (BloodmoonConfig.SEND_MESSAGE)
+							if (BloodmoonConfig.GENERAL.SEND_MESSAGE)
 							{
 								for (Object object : world.playerEntities)
 								{
@@ -107,9 +107,9 @@ public class BloodmoonHandler extends WorldSavedData
 								}
 							}
 
-							if (nightCounter == 0 && BloodmoonConfig.NTH_NIGHT != 0)
+							if (nightCounter == 0 && BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0)
 							{
-								nightCounter = BloodmoonConfig.NTH_NIGHT;
+								nightCounter = BloodmoonConfig.SCHEDULE.NTH_NIGHT;
 								this.markDirty();
 							}
 						}

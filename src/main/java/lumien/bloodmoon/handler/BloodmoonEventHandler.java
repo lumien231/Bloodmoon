@@ -3,6 +3,7 @@ package lumien.bloodmoon.handler;
 import lumien.bloodmoon.Bloodmoon;
 import lumien.bloodmoon.client.ClientBloodmoonHandler;
 import lumien.bloodmoon.config.BloodmoonConfig;
+import lumien.bloodmoon.lib.Reference;
 import lumien.bloodmoon.server.BloodmoonHandler;
 import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.util.DamageSource;
@@ -10,6 +11,8 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.EntityViewRenderEvent.FogColors;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.common.config.Config.Type;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -57,7 +60,7 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void livingUpdate(LivingUpdateEvent event)
 	{
-		if (BloodmoonConfig.VANISH && BloodmoonHandler.INSTANCE != null && event.getEntityLiving().dimension == 0 && !event.getEntityLiving().world.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.getEntityLiving().world.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
+		if (BloodmoonConfig.GENERAL.VANISH && BloodmoonHandler.INSTANCE != null && event.getEntityLiving().dimension == 0 && !event.getEntityLiving().world.isRemote && !BloodmoonHandler.INSTANCE.isBloodmoonActive() && event.getEntityLiving().world.getTotalWorldTime() % 20 == 0 && Math.random() <= 0.2f)
 		{
 			if (event.getEntityLiving().getEntityData().getBoolean("bloodmoonSpawned"))
 			{
@@ -69,7 +72,7 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void sleepInBed(PlayerSleepInBedEvent event)
 	{
-		if (BloodmoonHandler.INSTANCE != null && BloodmoonConfig.NO_SLEEP)
+		if (BloodmoonHandler.INSTANCE != null && BloodmoonConfig.GENERAL.NO_SLEEP)
 		{
 			if (Bloodmoon.proxy.isBloodmoon())
 			{
@@ -82,14 +85,14 @@ public class BloodmoonEventHandler
 	@SubscribeEvent
 	public void onConfigChange(OnConfigChangedEvent event)
 	{
-		Bloodmoon.config.onConfigChange(event);
+		ConfigManager.sync(Reference.MOD_ID, Type.INSTANCE);
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void fogColor(FogColors event)
 	{
-		if (BloodmoonConfig.BLACK_FOG && ClientBloodmoonHandler.INSTANCE.isBloodmoonActive())
+		if (BloodmoonConfig.APPEARANCE.BLACK_FOG && ClientBloodmoonHandler.INSTANCE.isBloodmoonActive())
 		{
 			event.setRed(Math.max(event.getRed() - ClientBloodmoonHandler.INSTANCE.fogRemove, 0));
 			event.setGreen(Math.max(event.getGreen() - ClientBloodmoonHandler.INSTANCE.fogRemove, 0));
