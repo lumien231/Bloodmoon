@@ -86,7 +86,7 @@ public class CommandBloodmoon extends CommandBase
 
 				Set<String> names = new HashSet<String>();
 
-				List<Entity> monsterNearby = senderEntity.world.getEntitiesInAABBexcluding(senderEntity, senderEntity.getEntityBoundingBox().expand(10, 10, 10), EntitySelectors.NOT_SPECTATING);
+				List<Entity> monsterNearby = senderEntity.world.getEntitiesInAABBexcluding(senderEntity, senderEntity.getEntityBoundingBox().grow(10, 10, 10), EntitySelectors.NOT_SPECTATING);
 
 				for (Entity e : monsterNearby)
 				{
