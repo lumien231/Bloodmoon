@@ -1,5 +1,6 @@
 text.bloodmoon.notify=Der Blutmond geht auf...
 text.bloodmoon.nosleep=Du fühlst dich nicht müde genug, um dich hinzulegen...
-text.bloodmoon.force=Die Nächste Nacht wird einen Blutmond haben.
+text.bloodmoon.force=Die nächste Nacht wird einen Blutmond haben.
 text.bloodmoon.stop=Blutmond wurde beendet.
-text.bloodmoon.commandError=Der Blutmond-Handler ist nicht geladen, probiere es nochmal in der Oberwelt.
+text.bloodmoon.commandError=Blutmond-Handler nicht geladen, probiere es nochmal in der Oberwelt.
+text.bloodmoon.entity=Monster im Umkreis von 20 Blöcken:
