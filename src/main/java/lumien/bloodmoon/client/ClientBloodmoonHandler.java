@@ -51,12 +51,14 @@ public class ClientBloodmoonHandler
 		}
 	}
 
-	public void skyColorHook(Vec3d color)
+	public Vec3d skyColorHook(Vec3d color)
 	{
 		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_SKY)
 		{
 			color.x += INSTANCE.skyColorAdd;
 		}
+		
+		return color;
 	}
 
 	public int manipulateRed(int position, int originalValue)

@@ -1,6 +1,6 @@
 package lumien.bloodmoon.asm;
 
-import static org.objectweb.asm.Opcodes.DUP;
+import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.GETSTATIC;
 import static org.objectweb.asm.Opcodes.ILOAD;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
@@ -43,7 +43,82 @@ public class ClassTransformer implements IClassTransformer
 		{
 			return patchEntityRendererClass(basicClass);
 		}
+		else if (transformedName.equals("net.minecraft.world.World"))
+		{
+			return patchWorld(basicClass);
+		}
 		return basicClass;
+	}
+
+	private byte[] patchWorld(byte[] basicClass)
+	{
+		ClassNode classNode = new ClassNode();
+		ClassReader classReader = new ClassReader(basicClass);
+		classReader.accept(classNode, 0);
+		logger.log(Level.DEBUG, "Found World Class: " + classNode.name);
+
+		MethodNode getSkyColor = null;
+		MethodNode getMoonPhase = null;
+
+		for (MethodNode mn : classNode.methods)
+		{
+			if (mn.name.equals(MCPNames.method("func_72833_a")))
+			{
+				getSkyColor = mn;
+			}
+			else if (mn.name.equals(MCPNames.method("func_72853_d")))
+			{
+				getMoonPhase = mn;
+			}
+		}
+
+		if (getSkyColor != null)
+		{
+			logger.log(Level.DEBUG, " - Found getSkyColor");
+
+			for (int i = 0; i < getSkyColor.instructions.size(); i++)
+			{
+				AbstractInsnNode ain = getSkyColor.instructions.get(i);
+
+				if (ain.getOpcode() == ARETURN)
+				{
+					InsnList toInsert = new InsnList();
+
+					toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
+					toInsert.add(new InsnNode(SWAP));
+					toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "skyColorHook", "(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;", false));
+
+					i += 3;
+					getSkyColor.instructions.insertBefore(ain, toInsert);
+				}
+			}
+		}
+
+		if (getMoonPhase != null)
+		{
+			logger.log(Level.DEBUG, " - Found getMoonPhase");
+
+			for (int i = 0; i < getMoonPhase.instructions.size(); i++)
+			{
+				AbstractInsnNode ain = getMoonPhase.instructions.get(i);
+
+				if (ain.getOpcode() == IRETURN)
+				{
+					InsnList toInsert = new InsnList();
+
+					toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
+					toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "moonColorHook", "()V", false));
+
+					i += 2;
+					getMoonPhase.instructions.insertBefore(ain, toInsert);
+				}
+			}
+		}
+
+		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+		classNode.accept(writer);
+
+		return writer.toByteArray();
 	}
 
 	private byte[] patchRenderGlobal(byte[] basicClass)
@@ -66,7 +141,7 @@ public class ClassTransformer implements IClassTransformer
 			}
 		}
 
-		if (renderSky != null)
+		if (renderSky != null && false)
 		{
 			logger.log(Level.DEBUG, " - Found renderSky");
 			for (int i = 0; i < renderSky.instructions.size(); i++)
@@ -79,8 +154,7 @@ public class ClassTransformer implements IClassTransformer
 					{
 						logger.log(Level.DEBUG, " - Found moonColor");
 						InsnList toInsert = new InsnList();
-						toInsert.add(new FieldInsnNode(GETSTATIC, "lumien/bloodmoon/client/ClientBloodmoonHandler", "INSTANCE", "Llumien/bloodmoon/client/ClientBloodmoonHandler;"));
-						toInsert.add(new MethodInsnNode(INVOKEVIRTUAL, "lumien/bloodmoon/client/ClientBloodmoonHandler", "moonColorHook", "()V", false));
+
 						renderSky.instructions.insert(fin, toInsert);
 						i += 2;
 					}
