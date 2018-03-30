@@ -1,0 +1,6 @@
+text.bloodmoon.notify=La Luna di Sangue sta sorgendo...
+text.bloodmoon.nosleep=Non ti senti abbastanza stanco per dormire...
+text.bloodmoon.force=Ci sarà una Luna di Sangue la prossima notte
+text.bloodmoon.stop=La Luna di Sangue è stata interrotta
+text.bloodmoon.commandError=Bloodmoon Handler non caricato, prova ad eseguirlo nell'overworld.
+text.bloodmoon.entity=Mostri entro 20 blocchi:
