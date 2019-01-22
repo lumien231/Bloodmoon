@@ -1,5 +1,6 @@
 package lumien.bloodmoon.client;
 
+import lumien.bloodmoon.Bloodmoon;
 import org.lwjgl.opengl.GL11;
 
 import lumien.bloodmoon.config.BloodmoonConfig;
@@ -45,7 +46,7 @@ public class ClientBloodmoonHandler
 
 	public void moonColorHook()
 	{
-		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_MOON)
+		if (isBloodmoonActive() && BloodmoonConfig.APPEARANCE.RED_MOON && Bloodmoon.proxy.canColorMoon() )
 		{
 			GL11.glColor3f(0.8f, 0, 0);
 		}

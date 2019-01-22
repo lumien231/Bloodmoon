@@ -41,4 +41,9 @@ public class CommonProxy
 			return BloodmoonHandler.INSTANCE.isBloodmoonActive();
 		}
 	}
+
+	public boolean canColorMoon()
+	{
+		return false;
+	}
 }
