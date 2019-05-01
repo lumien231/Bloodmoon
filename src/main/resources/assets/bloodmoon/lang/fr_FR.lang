@@ -1,0 +1,6 @@
+text.bloodmoon.notify=La lune rouge se lève...
+text.bloodmoon.nosleep=Vous n'êtes pas assez fatigué pour dormir...
+text.bloodmoon.force=Il y aura une lune rouge la prochaine fois
+text.bloodmoon.stop=Arrêt de la lune rouge
+text.bloodmoon.commandError=Gestionnaire de la lune rouge non chargé, essayez d'exéctuer cela depuis le monde.
+text.bloodmoon.entity=Monstre dans un rayon de 20 blocs :
