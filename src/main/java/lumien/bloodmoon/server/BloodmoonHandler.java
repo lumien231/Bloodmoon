@@ -97,6 +97,15 @@ public class BloodmoonHandler extends WorldSavedData
 						{
 							forceBloodMoon = false;
 							setBloodmoon(true);
+							
+							world.getWorldInfo().setCleanWeatherTime(24000 - time);
+							if(world.isRaining())
+							{
+								world.getWorldInfo().setRainTime(0);
+								world.getWorldInfo().setThunderTime(0);
+								world.getWorldInfo().setRaining(false);
+								world.getWorldInfo().setThundering(false);
+							}
 
 							if (BloodmoonConfig.GENERAL.SEND_MESSAGE)
 							{
