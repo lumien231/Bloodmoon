@@ -1,5 +1,6 @@
 package lumien.bloodmoon.server;
 
+import lumien.bloodmoon.Bloodmoon;
 import lumien.bloodmoon.config.BloodmoonConfig;
 import lumien.bloodmoon.network.PacketHandler;
 import lumien.bloodmoon.network.messages.MessageBloodmoonStatus;
@@ -61,7 +62,8 @@ public class BloodmoonHandler extends WorldSavedData
 			World world = event.world;
 			if (world.provider.getDimension() == 0)
 			{
-				int time = (int) (world.getWorldTime() % 24000);
+				long wt = world.getWorldTime();
+				int time = (int) (wt % 24000);
 				if (isBloodmoonActive())
 				{
 					if (!BloodmoonConfig.GENERAL.RESPECT_GAMERULE || world.getGameRules().getBoolean("doMobSpawning"))
@@ -92,8 +94,7 @@ public class BloodmoonHandler extends WorldSavedData
 
 							this.markDirty();
 						}
-
-						if (forceBloodMoon || Math.random() < BloodmoonConfig.SCHEDULE.CHANCE || (BloodmoonConfig.SCHEDULE.FULLMOON && world.getCurrentMoonPhaseFactor() == 1.0F) || (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0 && nightCounter == 0))
+						if (forceBloodMoon || Math.random() < BloodmoonConfig.SCHEDULE.CHANCE || (BloodmoonConfig.SCHEDULE.PHASE_DEPENDANT && world.provider.getMoonPhase(wt) == BloodmoonConfig.SCHEDULE.PHASE_NUM) || (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0 && nightCounter == 0))
 						{
 							forceBloodMoon = false;
 							setBloodmoon(true);

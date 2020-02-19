@@ -71,9 +71,13 @@ public class BloodmoonConfig
 		@Comment(value = { "The chance of a bloodmoon occuring at the beginning of a night (0=Never;1=Every night;0.05=5% of all nights)" })
 		public double CHANCE = 0.05;
 
-		@Name(value = "Fullmoon")
-		@Comment(value = { "Whether there should be a bloodmoon whenever there is a full moon" })
-		public boolean FULLMOON = false;
+		@Name(value = "PhaseDependant")
+		@Comment(value = { "The bloodmoon depends on the phase set in the Phase setting" })
+		public boolean PHASE_DEPENDANT = true;
+
+		@Name(value = "Phase")
+		@Comment(value = { "Range from 0 to 7 (0 = Full Moon, 4 = New Moon)" })
+		public int PHASE_NUM = 0;
 
 		@Name(value = "NthNight")
 		@Comment(value = { "Every nth night there will be a bloodmoon (0 disables this, 1 would be every night, 2 every second night)" })
