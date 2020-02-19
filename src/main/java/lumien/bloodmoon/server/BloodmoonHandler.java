@@ -93,7 +93,7 @@ public class BloodmoonHandler extends WorldSavedData
 							this.markDirty();
 						}
 
-						if (forceBloodMoon || Math.random() < BloodmoonConfig.SCHEDULE.CHANCE || (BloodmoonConfig.SCHEDULE.FULLMOON && world.getCurrentMoonPhaseFactor() == 1.0F) || (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0 && nightCounter == 0))
+						if (forceBloodMoon || Math.random() < BloodmoonConfig.SCHEDULE.CHANCE || (BloodmoonConfig.SCHEDULE.PHASE_DEPENDANT && world.getMoonPhase() == BloodmoonConfig.SCHEDULE.PHASE_NUM) || (BloodmoonConfig.SCHEDULE.NTH_NIGHT != 0 && nightCounter == 0))
 						{
 							forceBloodMoon = false;
 							setBloodmoon(true);
