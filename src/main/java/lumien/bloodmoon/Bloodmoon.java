@@ -1,5 +1,7 @@
 package lumien.bloodmoon;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import lumien.bloodmoon.config.BloodmoonConfig;
 import lumien.bloodmoon.lib.Reference;
 import lumien.bloodmoon.proxy.CommonProxy;
@@ -25,6 +27,8 @@ public class Bloodmoon
 	@SidedProxy(clientSide = "lumien.bloodmoon.proxy.ClientProxy", serverSide = "lumien.bloodmoon.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	public static BloodmoonConfig config;
+	
+	public static final Logger LOGGER = LogManager.getLogger(Reference.MOD_ID);
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
